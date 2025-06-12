@@ -1,3 +1,14 @@
+// Busca o AMI Amazon Linux 2 mais recente
+data "aws_ami" "amazon_linux_2" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["amzn2-ami-hvm-*-x86_64-gp2"]
+  }
+}
+
 # Cria uma VPC simples
 resource "aws_vpc" "demo_vpc" {
   cidr_block           = "10.0.0.0/16"
@@ -27,19 +38,19 @@ resource "aws_security_group" "demo_sg" {
   vpc_id      = aws_vpc.demo_vpc.id
 
   ingress {
-    description      = "SSH"
-    from_port        = 22
-    to_port          = 22
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    description = "SSH"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   ingress {
-    description      = "HTTP"
-    from_port        = 80
-    to_port          = 80
-    protocol         = "tcp"
-    cidr_blocks      = ["0.0.0.0/0"]
+    description = "HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
   }
 
   egress {
@@ -56,7 +67,7 @@ resource "aws_security_group" "demo_sg" {
 
 # Instância EC2 de demonstração
 resource "aws_instance" "demo_ec2" {
-  ami                         = var.ami_id
+  ami                         = data.aws_ami.amazon_linux_2.id
   instance_type               = var.instance_type
   subnet_id                   = aws_subnet.demo_subnet.id
   vpc_security_group_ids      = [aws_security_group.demo_sg.id]
